@@ -30,7 +30,8 @@ check=$( grep "$2" AllDBs.txt )
            echo this database alreaady exits
        else
            echo $2 >> AllDBs.txt
-           touch "$2.txt"
+           mkdir "$2"
+           touch "$2/$2.txt"
        fi
         
    else
@@ -49,6 +50,19 @@ useDB(){
  else
      echo no such database found
  fi
+}
+
+dropDB(){
+   check=$( grep "$1" AllDBs.txt )
+
+   if [ $check ]
+   then
+       rm -r "$1"
+       sed -i  "/$1/d" AllDBs.txt
+   else
+       echo no such database found
+   fi
+       
 }
 
 
@@ -72,6 +86,9 @@ case $var1 in
     use)
        useDB $var2
     ;;
+    drop)
+        dropDB $var2
+    ;; 
     exit)
        echo bye bye
        break
