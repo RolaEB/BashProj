@@ -6,13 +6,19 @@ echo you are now in $dbName database
 createT(){
 
  check1=$( grep "$1" $dbName.txt )
-
+ # first check if this table already exits
  if [ $check1 ]
  then
       echo this table already exits
  else
-
-
+  
+   #write table name in db file
+   echo $1 >> $dbName/$dbName.txt
+   #creating neccesary folders and files
+   mkdir $dbName/$1
+   touch $dbName/$1/$1.txt
+   touch $dbName/$1/records.txt
+  
 while [ true ]
 do
   echo do you want to add a field to this table?Y/N
@@ -23,7 +29,7 @@ do
       do   
         echo enter field name
         read name
-        check2=$( grep "$name" "$1.txt" )
+        check2=$( grep "$name" "$dbName/$1/$1.txt" )#check that field does not already exist
 
         if [ $check2 ]
         then
@@ -45,7 +51,7 @@ do
   echo Does this field has a default value? or None?
   read default
    
-  echo "$name,$dtype,$pk,$unique,$null,$default" >> "$1.txt"
+  echo "$name,$dtype,$pk,$unique,$null,$default" >> "$dbName/$1/$1.txt"
   else
       break
   fi
@@ -58,6 +64,7 @@ insertR(){
   echo insert
 
 }
+
 
 editR(){
   echo edit
@@ -77,7 +84,17 @@ sortT(){
 }
 
 dropT(){
- echo drop
+  
+  check1=$( grep "$1" $dbName/$dbName.txt )
+  # first check if this table  exits
+  if [ $check1 ]
+  then
+     rm -r "$dbName/$1"
+     sed -i "/$1/d" $dbName/$dbName.txt  
+  else
+      echo no such table found
+  fi  
+
 }
 
 descT(){
@@ -111,7 +128,7 @@ do
              sortT
         ;;
         drop)
-             dropT
+             dropT $var2
         ;;
         desc)
             descT
