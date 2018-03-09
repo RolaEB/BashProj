@@ -5,7 +5,7 @@ echo you are now in $dbName database
 
 createT(){
 
- check1=$( grep "$1" $dbName.txt )
+ check1=$( grep "$1" $dbName/$dbName.txt )
  # first check if this table already exits
  if [ $check1 ]
  then
@@ -60,9 +60,66 @@ done
 fi
 }
 
-insertR(){
-  echo insert
+# checker functions
 
+checkType(){
+   input=$1
+   datatype=$2
+   if [ "$datatype" = "num" ]
+   then
+      re='^[0-9]+$'
+      if ! [[ $input =~ $re ]] ; then
+           echo error:$input is Not a number
+           return 1
+       fi
+   elif [ $datatype='string' ]
+   then
+       re='^[a-zA-Z]+$'
+      if ! [[ $input =~ $re ]] ; then
+           echo error:$input is Not a string
+           return 1
+       fi
+
+   fi
+}
+
+insertR(){
+  #check table exists
+  check1=$( grep "$1" "$dbName/$dbName.txt" )
+
+  if [ $check1 ]
+  then
+      #count number of fields in table
+      numfields=$(cat $dbName/$1/$1.txt |wc -l)
+      counter=1
+      echo Enter your record:
+      read -a record
+      if [ $numfields -eq ${#record[@]} ]
+      then
+          
+          for i in ${record[@]}
+          do
+          # get restrictions of field
+          awk "NR==$counter" $dbName/$1/$1.txt > /tmp/restr.txt
+          cat  /tmp/restr.txt
+          #cut -d',' -f1 /tmp/restr.txt
+          
+          
+          checkType $i $( cut -d',' -f2 /tmp/restr.txt )
+          #checkPK $i $( cut -d',' -f3 /tmp/restr.txt )
+          #checkNull $i $( cut -d',' -f4 /tmp/restr.txt )
+          #checkUnique $i $( cut -d',' -f5 /tmp/restr.txt )
+          #checkDefault $i $( cut -d',' -f6 /tmp/restr.txt )
+          let "counter++"
+          
+          done
+      else
+         echo Error,check your syntax!
+      fi
+
+  else 
+    echo Table does not exist
+  fi
 }
 
 
@@ -98,7 +155,19 @@ dropT(){
 }
 
 descT(){
-  echo describe
+  check1=$( grep "$1" $dbName/$dbName.txt )
+  # first check if this table  exits
+  if [ $check1 ]
+  then
+     echo $1
+     echo "Field Name  Type  PK  Null  Unique Default  "
+     awk 'BEGIN {FS=","}{print "Name: "$1;print "Datatype: "$2;print "PK: "$3;print "Null: "$4;print "Unique: "$5;print "Default: "$6}' $dbName/$1/$1.txt
+
+     
+  else
+      echo no such table found
+  fi
+
 }
 
 alterT(){
@@ -113,7 +182,7 @@ do
              createT $var2
         ;;
        insert)
-             insertR
+             insertR $var2
         ;;
         edit)
              editR
@@ -131,7 +200,7 @@ do
              dropT $var2
         ;;
         desc)
-            descT
+            descT $var2
         ;;
         alter)
              alterT
