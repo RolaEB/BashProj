@@ -213,7 +213,23 @@ selectR(){
 }
 
 show(){
-  echo show
+  
+  check1=$( grep "$1" $dbName/$dbName.txt )
+  # first check if this table  exits
+  if [ $check1 ]
+  then
+      if [ -s $dbName/$1/records.txt ]
+      then
+          cat $dbName/$1/records.txt
+      else
+          echo No records found for this table
+      fi
+  else
+      echo table does not exist
+  fi
+
+
+  
 }
 
 sortT(){
@@ -270,7 +286,7 @@ do
              selectR
         ;;
         show)
-              show
+              show $var2
         ;;
         sort)
              sortT
