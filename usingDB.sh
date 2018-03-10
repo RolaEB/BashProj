@@ -233,7 +233,25 @@ show(){
 }
 
 sortT(){
- echo sort
+
+  check1=$( grep "$1" "$dbName/$dbName.txt" )
+  # check if table exists
+  if [ $check1 ]
+  then 
+      case $2 in
+          asc)
+              sort $dbName/$1/records.txt
+          ;;
+          desc)
+              sort -r $dbName/$1/records.txt
+          ;;
+          *)
+             echo command not found check your syntax
+         ;; 
+     esac
+  else
+     echo table does not exist
+  fi
 }
 
 dropT(){
@@ -271,7 +289,7 @@ alterT(){
 
 while [ true ]
 do
-  read var1 var2 
+  read var1 var2 var3
   case $var1 in
        create)
              createT $var2
@@ -289,7 +307,7 @@ do
               show $var2
         ;;
         sort)
-             sortT
+             sortT $var2 $var3
         ;;
         drop)
              dropT $var2
