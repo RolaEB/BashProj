@@ -209,7 +209,21 @@ editR(){
 }
 
 selectR(){
-  echo select
+  tname=$1
+  #check table exits
+  check1=$( grep "$1" "$dbName/$dbName.txt" )
+
+  if [ $check1 ]
+  then
+      export $dbName
+      export $tname
+      source selectT.sh     
+  else
+       echo table does not exist
+  fi
+
+
+ 
 }
 
 show(){
@@ -301,7 +315,7 @@ do
              editR
         ;;
         select)
-             selectR
+             selectR $var2
         ;;
         show)
               show $var2
@@ -319,7 +333,7 @@ do
              alterT
         ;;
         exit)
-             echo exit
+            
              break
         ;;
         *)
