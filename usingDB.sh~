@@ -204,21 +204,8 @@ insertR(){
 
 
 editR(){
- #check table exists
-  
-  tname=$1
+  echo edit
 
- check1=$( grep "$1" "$dbName/$dbName.txt" )
-
-  if [ $check1 ]
-  then
-       export $dbName
-       export $tname
-       source editR.sh
-  else
-      echo table does not exist
-  fi
-  
 }
 
 selectR(){
@@ -325,7 +312,7 @@ do
              insertR $var2
         ;;
         edit)
-             editR $var2
+             editR
         ;;
         select)
              selectR $var2
