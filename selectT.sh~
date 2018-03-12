@@ -3,6 +3,15 @@
 # $dbName
 # $tname
 
+printToHTML(){
+ 
+
+read -p " Enter name of file you want to save: " filename
+col=$(cat $dbName/$tname/$tname.txt |wc -l)
+cat $1 |awk 'BEGIN{print "<html>";print "<head> <style> table {font-family: arial, sans-serif;border-collapse: collapse;width: 100%;}{ border: 1px solid #dddddd;text-align: left;padding: 8px;}tr:nth-child(even) {background-color: #dddddd;}</style></head>";print "<body>";print "<table>"} {print "<tr>";for(i=1;i<='"$col"';i++)print "<td>" $i"</td>";print "</tr>"} END{print "</table>";print"</body>";print"</html>"}' > $filename
+   
+}
+
 
 read -p "Enter your selection pattern: " var1 var2 var3 var4
 
@@ -18,11 +27,15 @@ read -p "Enter your selection pattern: " var1 var2 var3 var4
                     then
                          echo $fnum
                          lineNum=($(cut -d " " -f $fnum $dbName/$tname/records.txt| grep -n "$var4" |cut -d :  -f 1))
+                          echo " " > /tmp/selection.txt
                          for line in ${lineNum[@]}
                          do
                            #print
                            sed -n "$line"p $dbName/$tname/records.txt
+                           sed -n "$line"p $dbName/$tname/records.txt >> /tmp/selection.txt
+                           
                          done 
+                         printToHTML /tmp/selection.txt
                     else
                          echo this field name does not exist
                     fi
@@ -30,12 +43,16 @@ read -p "Enter your selection pattern: " var1 var2 var3 var4
                like)
                     #print
                     sed -n "/$var3/p" $dbName/$tname/records.txt
+                    sed -n "/$var3/p" $dbName/$tname/records.txt > /tmp/selection.txt
+                   printToHTML /tmp/selection.txt
                ;;
                *)
                  if [ -z $var2 ]
                   then
                        #print
-                       cat  $dbName/$tname/records.txt    
+                       cat  $dbName/$tname/records.txt
+                       cat  $dbName/$tname/records.txt > /tmp/selection.txt
+                       printToHTML /tmp/selection.txt
                   else
                       echo no such command check your syntax
                   fi
@@ -54,6 +71,8 @@ read -p "Enter your selection pattern: " var1 var2 var3 var4
                  then
                      #print
                      cut -d " " -f $fnum $dbName/$tname/records.txt
+                     cut -d " " -f $fnum $dbName/$tname/records.txt > /tmp/selection.txt
+                     printToHTML /tmp/selection.txt
                  elif [ $var2 = "where" ]
                  then
                      #check fieldname exits and get its number
@@ -63,11 +82,15 @@ read -p "Enter your selection pattern: " var1 var2 var3 var4
                     then
                          echo $fnum1
                          lineNum=($(cut -d " " -f $fnum1 $dbName/$tname/records.txt| grep -n "$var4" |cut -d :  -f 1))
+                         echo "" > /tmp/selection.txt
                          for line in ${lineNum[@]}
                          do
                            #print
                            sed -n "$line"p $dbName/$tname/records.txt|cut -d " " -f $fnum
+                           sed -n "$line"p $dbName/$tname/records.txt|cut -d " " -f $fnum >> /tmp/selection.txt
+                           
                          done 
+                         printToHTML /tmp/selection.txt
                     else
                          echo this field name does not exist
                     fi
